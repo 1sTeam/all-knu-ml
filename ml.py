@@ -1,23 +1,45 @@
-import urllib
-import urllib.request
-import html.parser
+from urllib import response
 import requests
-from requests.exceptions import HTTPError
-from socket import error as SocketError
-from http.cookiejar import CookieJar
+from bs4 import BeautifulSoup
+import pandas as pd
 
-url = "https://web.kangnam.ac.kr/menu/e4058249224f49ab163131ce104214fb.do"
+headers = {'user-agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.62 Safari/537.36'}
 
-try:
-    req=urllib.request.Request(url, None, {'User-Agent': 'Mozilla/5.0 (X11; Linux i686; G518Rco3Yp0uLV40Lcc9hAzC1BOROTJADjicLjOmlr4=) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.157 Safari/537.36','Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8','Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.3','Accept-Encoding': 'gzip, deflate, sdch','Accept-Language': 'en-US,en;q=0.8','Connection': 'keep-alive'})
-    cj = CookieJar()
-    opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(cj))
-    response = opener.open(req)
-    raw_response = response.read().decode('utf8', errors='ignore')
+n = 493
 
-    print (raw_response)
+while(1):
+    url = "https://web.kangnam.ac.kr/menu/f19069e6134f8f8aa7f689a4a675e66f.do?paginationInfo.currentPageNo="+str(n)+"&searchMenuSeq=0&searchType=&searchValue="
+    n+=1
+    response = requests.get(url, headers=headers)
 
-    response.close()
-except urllib.request.HTTPError as inst:
-    output = format(inst)
-    print(output)
+    soup=BeautifulSoup(response.content, 'html.parser')
+    noticelist = list()
+    noticeArea=soup.find('div', class_='tbody')
+    if (noticeArea):
+        if(len(noticeArea.find_all('ul')) == 4 ):break
+
+        for item in noticeArea.find_all('ul')[4:]:
+            noticedict = dict()
+            if (item.find('li', class_='black05 ellipsis') != None):
+                li_list = item.find_all('li')
+                title = item.find('li', class_='black05 ellipsis').find("a").get("title")
+                link = item.find('li', class_='black05 ellipsis').find("a").get("data-params")
+                print(link)
+                link = "https://web.kangnam.ac.kr/menu/board/info/f19069e6134f8f8aa7f689a4a675e66f.do?scrtWrtiYn=false&encMenuSeq=%s&encMenuBoardSeq=%s" %(link[34:66],link[87:119])
+                print(link)
+                postdate = li_list[5].text
+                division = li_list[2].text
+
+            else:
+                continue
+
+            #print(title,  link, postdate, division)
+            noticedict['Title'] = title
+            noticedict['Link'] =  link
+            noticedict['PostDate'] = postdate
+            noticedict['division'] = division
+            noticedict['NoticeType'] = '공지사항'
+            noticelist.append(noticedict)
+        
+        df = pd.DataFrame.from_records(noticelist)
+        #print(df)
