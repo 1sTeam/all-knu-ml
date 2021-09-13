@@ -5,7 +5,7 @@ import pandas as pd
 
 headers = {'user-agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.62 Safari/537.36'}
 
-n = 493
+n = 1
 
 while(1):
     url = "https://web.kangnam.ac.kr/menu/f19069e6134f8f8aa7f689a4a675e66f.do?paginationInfo.currentPageNo="+str(n)+"&searchMenuSeq=0&searchType=&searchValue="
@@ -24,9 +24,7 @@ while(1):
                 li_list = item.find_all('li')
                 title = item.find('li', class_='black05 ellipsis').find("a").get("title")
                 link = item.find('li', class_='black05 ellipsis').find("a").get("data-params")
-                print(link)
                 link = "https://web.kangnam.ac.kr/menu/board/info/f19069e6134f8f8aa7f689a4a675e66f.do?scrtWrtiYn=false&encMenuSeq=%s&encMenuBoardSeq=%s" %(link[34:66],link[87:119])
-                print(link)
                 postdate = li_list[5].text
                 division = li_list[2].text
 
