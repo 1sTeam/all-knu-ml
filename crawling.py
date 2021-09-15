@@ -28,10 +28,12 @@ def all_pages_crawling():
                     postdate = li_list[5].text
                     division = li_list[2].text
                     text = single_page_crawling(link,headers)
+
                 else:
                     continue
 
                 #print(title,  link, postdate, division,text)
+                noticedict['binary'] = 0
                 noticedict['Title'] = title
                 noticedict['Link'] =  link
                 noticedict['PostDate'] = postdate
@@ -54,4 +56,5 @@ def single_page_crawling(link, headers):
 
     return text
             
-all_pages_crawling().to_csv("dataframe.csv", mode='a', header=False, encoding='utf-8-sig')
+print(all_pages_crawling())
+#all_pages_crawling().to_csv("dataframe.csv", mode='a', header=False, encoding='utf-8-sig')
