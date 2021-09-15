@@ -6,7 +6,7 @@ import pandas as pd
 def all_pages_crawling():
     headers = {'user-agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.62 Safari/537.36'}
     #1 부터 수집하면 오래걸림 공지사항이 494페이지까지 있어서 테스트용으로 490페이지부터 시작
-    n = 490
+    n = 1
     noticelist = list()
 
     while(1):
@@ -56,5 +56,5 @@ def single_page_crawling(link, headers):
 
     return text
             
-print(all_pages_crawling())
-#all_pages_crawling().to_csv("dataframe.csv", mode='a', header=False, encoding='utf-8-sig')
+#print(all_pages_crawling())
+all_pages_crawling().to_csv("dataframe.csv", mode='a', header=False, encoding='utf-8-sig')
