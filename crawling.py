@@ -33,7 +33,7 @@ def all_pages_crawling():
                     continue
 
                 #print(title,  link, postdate, division,text)
-                noticedict['binary'] = 0
+                noticedict['Binary'] = 0
                 noticedict['Title'] = title
                 noticedict['Link'] =  link
                 noticedict['PostDate'] = postdate
