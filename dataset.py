@@ -45,7 +45,6 @@ def text_tokenazation(dataset):
 
     return dataset
 
-
 test_dataset = text_spacing(test_dataset)
 test_dataset = text_tokenazation(test_dataset)
 print(test_dataset.Text)
