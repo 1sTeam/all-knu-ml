@@ -4,6 +4,8 @@ from konlpy.tag import Okt
 import urllib.request
 from soynlp import DoublespaceLineCorpus
 from soynlp.word import WordExtractor
+from soynlp.normalizer import *
+
 
 #머신러닝 학습을 위한 공지사항 data 추출
 df_csv = pd.read_csv("dataframe.csv",encoding='utf-8')
@@ -45,7 +47,15 @@ def text_tokenazation(dataset):
 
     return dataset
 
+def text_normalization(dataset):
+    for index, row in dataset.iterrows():
+        if(type(row.Text) == type("str")):
+            dataset.at[index, 'Text'] = emoticon_normalize(row.Text, num_repeats=2)
+            dataset.at[index, 'Text'] = repeat_normalize(row.Text, num_repeats=2)
+
 test_dataset = text_spacing(test_dataset)
 test_dataset = text_tokenazation(test_dataset)
+test_dataset = text_normalization(test_dataset)
+
 print(test_dataset.Text)
 
