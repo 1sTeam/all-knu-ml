@@ -54,8 +54,8 @@ def text_normalization(dataset):
             dataset.at[index, 'Text'] = repeat_normalize(row.Text, num_repeats=2)
 
 test_dataset = text_spacing(test_dataset)
-test_dataset = text_tokenazation(test_dataset)
 test_dataset = text_normalization(test_dataset)
+test_dataset = text_tokenazation(test_dataset)
 
 print(test_dataset.Text)
 
