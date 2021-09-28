@@ -14,19 +14,17 @@ from sklearn.model_selection import train_test_split
 
 
 dataset = pd.read_csv('dataset.csv', low_memory=False)
-# dataset['Text'] = dataset['Text'].fillna('')
 
-# m_dataset = np.array([dataset['Title'].to_numpy,dataset['Text'].to_numpy])
-m_dataset = np.array(dataset['Title'])
-
-
-tokenizer = Tokenizer()
-tokenizer.fit_on_texts(m_dataset)
-m_dataset = tokenizer.texts_to_sequences(m_dataset)
+# 데이터 셋 Null 값 제거
+dataset = dataset.dropna(how = 'any')
 
 x_train = []
-for i in m_dataset:
-    x_train.append(np.array(i))
+for i in dataset['Text']:
+    x_train.append(i)
+
+tokenizer = Tokenizer()
+tokenizer.fit_on_texts(x_train)
+x_train = tokenizer.texts_to_sequences(x_train)
 
 def below_threshold_len(max_len, nested_list):
   cnt = 0
@@ -35,7 +33,7 @@ def below_threshold_len(max_len, nested_list):
         cnt = cnt + 1
   print('전체 샘플 중 길이가 %s 이하인 샘플의 비율: %s'%(max_len, (cnt / len(nested_list))*100))
 
-max_len = 30
+max_len = 512
 below_threshold_len(max_len, x_train)
 
 y_train = np.array(dataset['Binary'])
@@ -45,8 +43,8 @@ x_train, x_test, y_train, y_test = train_test_split(
     x_train, y_train, test_size=0.2, random_state=1)
 
 model = Sequential()
-# model.add(Embedding(len(tokenizer.word_index), 100))
-# model.add(LSTM(128))
+#model.add(Embedding(len(tokenizer.word_index), 100))
+#model.add(LSTM(128))
 model.add(Dense(1, activation='sigmoid'))
 
 es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=4)
