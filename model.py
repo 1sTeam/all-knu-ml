@@ -15,9 +15,11 @@ from sklearn.model_selection import train_test_split
 
 dataset = pd.read_csv('dataset.csv', low_memory=False)
 
-x_train = np.array(dataset['Title'])
 y_train = np.array(dataset['Binary'])
+x_train = []
 
+for index in dataset['Title']:
+  x_train.append(np.fromstring(index, dtype=int, sep=','))
 
 x_train = pad_sequences(x_train, maxlen = 20)
 
@@ -33,7 +35,7 @@ es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=4)
 mc = ModelCheckpoint('best_model.h5', monitor='val_acc', mode='max', verbose=1, save_best_only=True)
 
 model.compile(optimizer='rmsprop', loss='binary_crossentropy', metrics=['acc'])
-history = model.fit(x_train, y_train, epochs=15, callbacks=[es, mc], batch_size=60, validation_split=0.2)
+history = model.fit(x_train, y_train, epochs=100, callbacks=[es, mc], batch_size=60, validation_split=0.2)
 
 loaded_model = load_model('best_model.h5')
 print("\n 테스트 정확도: %.4f" % (loaded_model.evaluate(x_test, y_test)[1]))
