@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 from pykospacing import Spacing
-from ckonlpy.tag import Twitter
+from konlpy.tag import Komoran
 import urllib.request
 from soynlp import DoublespaceLineCorpus
 from soynlp.word import WordExtractor
@@ -18,20 +18,15 @@ def text_normalization(dataset):
     dataset = dataset.dropna(how = 'any')
     dataset['Title'] = dataset['Title'].str.replace("[^ㄱ-ㅎㅏ-ㅣ가-힣a-zA-Z ]","")
     dataset['Title'].replace('', np.nan, inplace=True)
-    print(dataset.isnull().sum())
 
     return dataset
-def text_tokenization(dataset):
-    twitter = Twitter()
-    twitter.add_dictionary('비교과프로그램','Noun')
-    twitter.add_dictionary('집중학습지원','Noun')
-    twitter.add_dictionary('취창업지원센터','Noun')
-    twitter.add_dictionary('진로취창업센터','Noun')
-    twitter.add_dictionary('마음나눔센터','Noun')
-    twitter.add_dictionary('CTL','Noun')
-    twitter.add_dictionary('참인재','Noun')
-    twitter.add_dictionary('취업동아리','Noun')
-text_normalization(dataset)
 
+def text_tokenization(dataset):
+    komoran = Komoran(userdic = 'user_dictionary.txt')
+    print(komoran.morphs(dataset[1,1]))
+    return dataset
+
+dataset = text_normalization(dataset)
+dataset = text_tokenization(dataset)
 # dataset.to_csv("dataset.csv", mode='a', header=False, encoding='utf-8-sig')
 
