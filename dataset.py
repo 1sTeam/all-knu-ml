@@ -40,16 +40,10 @@ def text_integer(dataset):
 
     dataset['Title'] = tokenizer.texts_to_sequences(dataset['Title'])
     return dataset
-
-def text_len_pad(dataset):
-    max_len = 30
-    dataset['Title'] = pad_sequences(dataset['Title'], maxlen=max_len)
-    return dataset
-
+    
 dataset = text_normalization(dataset)
 dataset = text_tokenization(dataset)
 dataset = text_integer(dataset)
-dataset = text_len_pad(dataset)
 
 dataset.to_csv("dataset.csv", mode='a', header=False, encoding='utf-8-sig')
 

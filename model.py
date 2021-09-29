@@ -15,29 +15,11 @@ from sklearn.model_selection import train_test_split
 
 dataset = pd.read_csv('dataset.csv', low_memory=False)
 
-# 데이터 셋 Null 값 제거
-dataset = dataset.dropna(how = 'any')
-
-x_train = []
-for i in dataset['Text']:
-    x_train.append(i)
-
-tokenizer = Tokenizer()
-tokenizer.fit_on_texts(x_train)
-x_train = tokenizer.texts_to_sequences(x_train)
-
-def below_threshold_len(max_len, nested_list):
-  cnt = 0
-  for s in nested_list:
-    if(len(s) <= max_len):
-        cnt = cnt + 1
-  print('전체 샘플 중 길이가 %s 이하인 샘플의 비율: %s'%(max_len, (cnt / len(nested_list))*100))
-
-max_len = 512
-below_threshold_len(max_len, x_train)
-
+x_train = np.array(dataset['Title'])
 y_train = np.array(dataset['Binary'])
-x_train = pad_sequences(x_train, maxlen = max_len)
+
+
+x_train = pad_sequences(x_train, maxlen = 20)
 
 x_train, x_test, y_train, y_test = train_test_split(
     x_train, y_train, test_size=0.2, random_state=1)
