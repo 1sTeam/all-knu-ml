@@ -46,8 +46,8 @@ dataset = df_csv[['Binary','Title']]
 dataset = dataset.head(1000)
 dataset = text_processing(dataset)
 dataset.text_normalization()
-dataset.text_integer()
 dataset.text_tokenization()
 
-dataset.to_csv("dataset.csv", mode='a', header=False, encoding='utf-8-sig')
+#데이터 셋 저장
+#dataset.to_csv("dataset.csv", mode='a', header=False, encoding='utf-8-sig')
 

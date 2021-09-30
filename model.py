@@ -45,11 +45,12 @@ def create_predict(dataset):
 
 def sentiment_text_processing():
   m_dataset = cl.single_page_crawling_for_modeling()
-  m_dataset = dt.text_normalization(m_dataset)
-  m_dataset = dt.text_tokenization(m_dataset)
-  m_dataset = dt.text_integer(m_dataset)
-
-  return m_dataset
+  m_dataset = dt.text_processing(m_dataset)
+  m_dataset.text_normalization()
+  m_dataset.text_tokenization()
+  m_dataset.text_integer()
+  
+  return m_dataset.dataset
   
 def sentiment_predict(m_dataset, model):
   x_train = pad_sequences(m_dataset['Title'], maxlen = 20)
@@ -62,11 +63,13 @@ def sentiment_predict(m_dataset, model):
     else:
       print("{:.2f}% 확률로 비교과 프로그램이 아닙니다.\n".format((1 - score) * 100))
 
-
+#전처리 된 데이터셋 불러오기
 dataset = pd.read_csv('dataset.csv', low_memory=False)
-model = create_predict(dataset)
 
-tp = dt.text_processing(dataset)
+#모델 생성
+# model = create_predict(dataset)
+#모델 불러오기
+model = load_model('best_model.h5')
 
-
-sentiment_predict(tp.dataset, model)
+s_dataset = sentiment_text_processing()
+sentiment_predict(s_dataset, model)
