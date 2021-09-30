@@ -9,41 +9,45 @@ from soynlp.normalizer import *
 from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 
+class text_processing():
+    def __init__(self,dataset):
+        self.dataset = dataset
+
+    def text_normalization(self):
+        self.dataset = self.dataset.dropna(how = 'any')
+        self.dataset['Title'] = self.dataset['Title'].str.replace("[^ㄱ-ㅎㅏ-ㅣ가-힣a-zA-Z ]","")
+        self.dataset['Title'].replace('', np.nan, inplace=True)
+        return self.dataset
+
+    def text_tokenization(self):
+        komoran = Komoran(userdic= 'dic.txt')
+        temp = []
+        for sentence in self.dataset['Title']:
+            temp.append(komoran.nouns(sentence))
+        self.dataset['Title'] = temp
+        return self.dataset
+
+    def text_integer(self):
+        tokenizer = Tokenizer()
+        tokenizer.fit_on_texts(self.dataset['Title'])
+        token_size = len(tokenizer.word_index)
+
+        tokenizer = Tokenizer(token_size)
+        tokenizer.fit_on_texts(self.dataset['Title'])
+
+        self.dataset['Title'] = tokenizer.texts_to_sequences(self.dataset['Title'])
+        return self.dataset
+
 #머신러닝 학습을 위한 공지사항 data 추출
 df_csv = pd.read_csv("dataframe.csv",encoding='utf-8')
 dataset = df_csv[['Binary','Title']]
 
 #데이터 셋
 dataset = dataset.head(1000)
-
-def text_normalization(dataset):
-    dataset = dataset.dropna(how = 'any')
-    dataset['Title'] = dataset['Title'].str.replace("[^ㄱ-ㅎㅏ-ㅣ가-힣a-zA-Z ]","")
-    dataset['Title'].replace('', np.nan, inplace=True)
-    return dataset
-
-def text_tokenization(dataset):
-    komoran = Komoran(userdic= 'dic.txt')
-    temp = []
-    for sentence in dataset['Title']:
-        temp.append(komoran.nouns(sentence))
-    dataset['Title'] = temp
-    return dataset
-
-def text_integer(dataset):
-    tokenizer = Tokenizer()
-    tokenizer.fit_on_texts(dataset['Title'])
-    token_size = len(tokenizer.word_index)
-
-    tokenizer = Tokenizer(token_size)
-    tokenizer.fit_on_texts(dataset['Title'])
-
-    dataset['Title'] = tokenizer.texts_to_sequences(dataset['Title'])
-    return dataset
-    
-dataset = text_normalization(dataset)
-dataset = text_tokenization(dataset)
-dataset = text_integer(dataset)
+dataset = text_processing(dataset)
+dataset.text_normalization()
+dataset.text_integer()
+dataset.text_tokenization()
 
 dataset.to_csv("dataset.csv", mode='a', header=False, encoding='utf-8-sig')
 
