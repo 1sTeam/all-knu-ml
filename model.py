@@ -1,11 +1,8 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import re
-import urllib.request
 import dataset as dt
 import crawling as cl
-from konlpy.tag import Okt
 from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from tensorflow.keras.layers import Embedding, Dense, LSTM
@@ -14,52 +11,76 @@ from tensorflow.keras.models import load_model
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 from sklearn.model_selection import train_test_split
 
-dataset = pd.read_csv('dataset.csv', low_memory=False)
+def create_predict(dataset):
+  dataset = pd.read_csv('dataset.csv', low_memory=False)
+  y_train = np.array(dataset['Binary'])
+  x_train = []
+  for index in dataset['Title']:
+    x_train.append(np.fromstring(index, dtype=int, sep=','))
 
-y_train = np.array(dataset['Binary'])
+  x_train = pad_sequences(x_train, maxlen = 20)
 
-x_train = []
-for index in dataset['Title']:
-  x_train.append(np.fromstring(index, dtype=int, sep=','))
+  x_train, x_test, y_train, y_test = train_test_split(
+      x_train, y_train, test_size=0.2, random_state=1)
 
-x_train = pad_sequences(x_train, maxlen = 20)
+  model = Sequential()
+  model.add(Embedding(1024, 100))
+  model.add(LSTM(128))
+  model.add(Dense(1, activation='sigmoid'))
 
-x_train, x_test, y_train, y_test = train_test_split(
-    x_train, y_train, test_size=0.2, random_state=1)
+  es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=4)
+  mc = ModelCheckpoint('best_model.h5', monitor='val_acc', mode='max', verbose=1, save_best_only=True)
 
-model = Sequential()
-model.add(Embedding(1024, 100))
-model.add(LSTM(128))
-model.add(Dense(1, activation='sigmoid'))
+  model.compile(optimizer='rmsprop', loss='binary_crossentropy', metrics=['acc'])
+  history = model.fit(x_train, y_train, epochs=15, callbacks=[es, mc], batch_size=60, validation_split=0.2)
 
-es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=4)
-mc = ModelCheckpoint('best_model.h5', monitor='val_acc', mode='max', verbose=1, save_best_only=True)
+  loaded_model = load_model('best_model.h5')
 
-model.compile(optimizer='rmsprop', loss='binary_crossentropy', metrics=['acc'])
-history = model.fit(x_train, y_train, epochs=15, callbacks=[es, mc], batch_size=60, validation_split=0.2)
-
-loaded_model = load_model('best_model.h5')
-print("\n 테스트 정확도: %.4f" % (loaded_model.evaluate(x_test, y_test)[1]))
-
+  print("\n 테스트 정확도: %.4f" % (load_model.evaluate(x_test, y_test)[1]))
+  return load_model
 
 
 def sentiment_text_processing():
   m_dataset = cl.single_page_crawling_for_modeling()
-  m_dataset = dt.text_normalization(m_dataset)
-  m_dataset = dt.text_tokenization(m_dataset)
-  m_dataset = dt.text_integer(m_dataset)
+  m_dataset = dt.text_processing(m_dataset)
+  m_dataset.text_normalization()
+  m_dataset.text_tokenization()
+  m_dataset.text_integer()
 
-  return m_dataset
+  return m_dataset.dataset
   
-def sentiment_predict(m_dataset):
+def sentiment_predict(m_dataset, model):
   x_train = pad_sequences(m_dataset['Title'], maxlen = 20)
 
-  for sentence in x_train:
-    score = max(loaded_model.predict(sentence)) # 예측
-    score = float(score)
-    if(score > 0.5):
-      print("{:.2f}% 확률로 비교과프로그램입니다.\n".format(score * 100))
-    else:
-      print("{:.2f}% 확률로 비교과 프로그램이 아닙니다.\n".format((1 - score) * 100))
+  # for sentence in x_train:
+  score = model.predict(x_train)
 
-sentiment_predict(sentiment_text_processing())
+  print(score)
+
+  for s in score:
+    s = float(s)
+    if(s > 0.5):
+      print("{:.2f}% 확률로 비교과프로그램입니다.\n".format(s * 100))
+    else:
+      print("{:.2f}% 확률로 비교과 프로그램이 아닙니다.\n".format((1 - s) * 100))
+
+def visualize(m_dataset,m_target):
+    
+    x_train = []
+    for index in dataset['Title']:
+        x_train.append(np.fromstring(index, dtype=int, sep=','))
+        
+
+#전처리 된 데이터셋 불러오기
+dataset = pd.read_csv('dataset.csv', low_memory=False)
+
+
+# visualize(dataset['Title'], dataset['Binary'])
+#모델 생성
+#model = create_predict(dataset)
+
+#모델 불러오기
+model = load_model('best_model.h5')
+
+s_dataset = sentiment_text_processing()
+sentiment_predict(s_dataset, model)
