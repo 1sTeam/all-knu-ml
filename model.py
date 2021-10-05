@@ -1,11 +1,8 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import re
-import urllib.request
 import dataset as dt
 import crawling as cl
-from konlpy.tag import Okt
 from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from tensorflow.keras.layers import Embedding, Dense, LSTM
@@ -49,25 +46,39 @@ def sentiment_text_processing():
   m_dataset.text_normalization()
   m_dataset.text_tokenization()
   m_dataset.text_integer()
-  
+
   return m_dataset.dataset
   
 def sentiment_predict(m_dataset, model):
   x_train = pad_sequences(m_dataset['Title'], maxlen = 20)
 
-  for sentence in x_train:
-    score = max(model.predict(sentence)) # 예측
-    score = float(score)
-    if(score > 0.5):
-      print("{:.2f}% 확률로 비교과프로그램입니다.\n".format(score * 100))
+  # for sentence in x_train:
+  score = model.predict(x_train)
+
+  print(score)
+
+  for s in score:
+    s = float(s)
+    if(s > 0.5):
+      print("{:.2f}% 확률로 비교과프로그램입니다.\n".format(s * 100))
     else:
-      print("{:.2f}% 확률로 비교과 프로그램이 아닙니다.\n".format((1 - score) * 100))
+      print("{:.2f}% 확률로 비교과 프로그램이 아닙니다.\n".format((1 - s) * 100))
+
+def visualize(m_dataset,m_target):
+    
+    x_train = []
+    for index in dataset['Title']:
+        x_train.append(np.fromstring(index, dtype=int, sep=','))
+        
 
 #전처리 된 데이터셋 불러오기
 dataset = pd.read_csv('dataset.csv', low_memory=False)
 
+
+# visualize(dataset['Title'], dataset['Binary'])
 #모델 생성
-# model = create_predict(dataset)
+#model = create_predict(dataset)
+
 #모델 불러오기
 model = load_model('best_model.h5')
 
