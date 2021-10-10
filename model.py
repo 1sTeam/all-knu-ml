@@ -18,7 +18,7 @@ def create_predict(dataset):
   for index in dataset['Title']:
     x_train.append(np.fromstring(index, dtype=int, sep=','))
 
-  x_train = pad_sequences(x_train, maxlen = 20)
+  x_train = pad_sequences(x_train, maxlen = 12)
 
   x_train, x_test, y_train, y_test = train_test_split(
       x_train, y_train, test_size=0.2, random_state=1)
@@ -36,7 +36,6 @@ def create_predict(dataset):
 
   loaded_model = load_model('best_model.h5')
 
-  print("\n 테스트 정확도: %.4f" % (load_model.evaluate(x_test, y_test)[1]))
   return load_model
 
 
@@ -50,7 +49,7 @@ def sentiment_text_processing():
   return m_dataset.dataset
   
 def sentiment_predict(m_dataset, model):
-  x_train = pad_sequences(m_dataset['Title'], maxlen = 20)
+  x_train = pad_sequences(m_dataset['Title'], maxlen = 12)
 
   # for sentence in x_train:
   score = model.predict(x_train)
@@ -77,7 +76,7 @@ dataset = pd.read_csv('dataset.csv', low_memory=False)
 
 # visualize(dataset['Title'], dataset['Binary'])
 #모델 생성
-#model = create_predict(dataset)
+model = create_predict(dataset)
 
 #모델 불러오기
 model = load_model('best_model.h5')
