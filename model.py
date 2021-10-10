@@ -18,13 +18,13 @@ def create_predict(dataset):
   for index in dataset['Title']:
     x_train.append(np.fromstring(index, dtype=int, sep=','))
 
-  x_train = pad_sequences(x_train, maxlen = 12)
+  x_train = pad_sequences(x_train, maxlen = 20)
 
-  x_train, x_test, y_train, y_test = train_test_split(
-      x_train, y_train, test_size=0.2, random_state=1)
+  # x_train, x_test, y_train, y_test = train_test_split(
+  #     x_train, y_train, test_size=0.2, random_state=1)
 
   model = Sequential()
-  model.add(Embedding(1024, 100))
+  model.add(Embedding(1152, 50))
   model.add(LSTM(128))
   model.add(Dense(1, activation='sigmoid'))
 
@@ -32,15 +32,16 @@ def create_predict(dataset):
   mc = ModelCheckpoint('best_model.h5', monitor='val_acc', mode='max', verbose=1, save_best_only=True)
 
   model.compile(optimizer='rmsprop', loss='binary_crossentropy', metrics=['acc'])
-  history = model.fit(x_train, y_train, epochs=15, callbacks=[es, mc], batch_size=60, validation_split=0.2)
+  history = model.fit(x_train, y_train, epochs=15, callbacks=[es, mc], batch_size=30, validation_split=0.2)
+  # history = model.fit(x_train, y_train, epochs=15, batch_size=30, validation_split=0.2)
 
   loaded_model = load_model('best_model.h5')
-
   return load_model
 
 
 def sentiment_text_processing():
   m_dataset = cl.single_page_crawling_for_modeling()
+  print(m_dataset['Title'])
   m_dataset = dt.text_processing(m_dataset)
   m_dataset.text_normalization()
   m_dataset.text_tokenization()
@@ -49,7 +50,7 @@ def sentiment_text_processing():
   return m_dataset.dataset
   
 def sentiment_predict(m_dataset, model):
-  x_train = pad_sequences(m_dataset['Title'], maxlen = 12)
+  x_train = pad_sequences(m_dataset['Title'], maxlen = 20)
 
   # for sentence in x_train:
   score = model.predict(x_train)
