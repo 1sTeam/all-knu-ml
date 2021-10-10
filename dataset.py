@@ -12,6 +12,7 @@ from tensorflow.keras.preprocessing.sequence import pad_sequences
 class text_processing():
     def __init__(self,dataset):
         self.dataset = dataset
+        self.token_size = 0
 
     def text_normalization(self):
         self.dataset = self.dataset.dropna(how = 'any')
@@ -36,6 +37,7 @@ class text_processing():
         tokenizer.fit_on_texts(self.dataset['Title'])
 
         self.dataset['Title'] = tokenizer.texts_to_sequences(self.dataset['Title'])
+        self.token_size = token_size
         return self.dataset
 
 #머신러닝 학습을 위한 공지사항 data 추출
@@ -47,6 +49,8 @@ dataset = dataset.head(1000)
 dataset = text_processing(dataset)
 dataset.text_normalization()
 dataset.text_tokenization()
+dataset.text_integer()
+print(dataset.token_size)
 
 #데이터 셋 저장
 #dataset.to_csv("dataset.csv", mode='a', header=False, encoding='utf-8-sig')
