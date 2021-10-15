@@ -38,7 +38,7 @@ def create_predict(dataset):
 
   model.compile(optimizer='rmsprop', loss='binary_crossentropy', metrics=['acc'])
   # history = model.fit(x_train, y_train, epochs=15, callbacks=[es, mc], batch_size=30, validation_split=0.2)
-  history = model.fit(x_train, y_train, epochs=15, batch_size=30, validation_split=0.2)
+  history = model.fit(x_train, y_train, epochs=30, batch_size=60, validation_split=0.2)
 
   # loaded_model = load_model('best_model.h5')
   return model

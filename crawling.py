@@ -11,13 +11,14 @@ def all_pages_crawling(n = 1):
     while(1):
         url = "https://web.kangnam.ac.kr/menu/f19069e6134f8f8aa7f689a4a675e66f.do?paginationInfo.currentPageNo="+str(n)+"&searchMenuSeq=0&searchType=&searchValue="
         n+=1
+        print(n)
         response = requests.get(url, headers=headers)
         soup=BeautifulSoup(response.content, 'html.parser')
         noticeArea=soup.find('div', class_='tbody')
         if (noticeArea):
-            if(len(noticeArea.find_all('ul')) == 4 ):break
+            if(len(noticeArea.find_all('ul')) == 3 ):break
 
-            for item in noticeArea.find_all('ul')[4:]:
+            for item in noticeArea.find_all('ul')[3:]:
                 noticedict = dict()
                 if (item.find('li', class_='black05 ellipsis') != None):
                     li_list = item.find_all('li')
@@ -26,7 +27,7 @@ def all_pages_crawling(n = 1):
                     link = "https://web.kangnam.ac.kr/menu/board/info/f19069e6134f8f8aa7f689a4a675e66f.do?scrtWrtiYn=false&encMenuSeq=%s&encMenuBoardSeq=%s" %(link[34:66],link[87:119])
                     postdate = li_list[5].text
                     division = li_list[2].text
-                    text = single_page_crawling(link,headers)
+                    #text = single_page_crawling(link,headers)
 
                 else:
                     continue
@@ -38,7 +39,7 @@ def all_pages_crawling(n = 1):
                 noticedict['PostDate'] = postdate
                 noticedict['division'] = division
                 noticedict['NoticeType'] = '공지사항'
-                noticedict['Text'] = text
+                #noticedict['Text'] = text
                 noticelist.append(noticedict)
      
     df = pd.DataFrame.from_records(noticelist)
@@ -80,4 +81,4 @@ def single_page_crawling_for_modeling():
     return df
 
 #print(all_pages_crawling())
-#all_pages_crawling().to_csv("dataframe.csv", mode='a', header=False, encoding='utf-8-sig')
+all_pages_crawling().to_csv("dataframe.csv", mode='a', header=False, encoding='utf-8-sig')
