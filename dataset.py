@@ -41,17 +41,15 @@ class text_processing():
         return self.dataset
 
 #머신러닝 학습을 위한 공지사항 data 추출
-df_csv = pd.read_csv("dataframe.csv",encoding='utf-8')
-dataset = df_csv[['Binary','Title']]
+# df_csv = pd.read_csv("dataframe.csv",encoding='utf-8')
+# dataset = df_csv[['Binary','Title']]
 
-#데이터 셋
-dataset = dataset.head(1000)
-dataset = text_processing(dataset)
-dataset.text_normalization()
-dataset.text_tokenization()
-dataset.text_integer()
-print(dataset.token_size)
+# #데이터 셋
+# dataset = dataset.head(1100)
+# dataset = text_processing(dataset)
+# dataset.text_normalization()
+# dataset.text_tokenization()
+# dataset.text_integer()
 
 #데이터 셋 저장
-#dataset.to_csv("dataset.csv", mode='a', header=False, encoding='utf-8-sig')
 

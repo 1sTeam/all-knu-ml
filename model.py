@@ -28,7 +28,7 @@ def create_predict(dataset):
   # model.add(Embedding(1152, 100))
   # model.add(Bidirectional(LSTM(100)))
   # model.add(Dense(1, activation='relu'))
-  model.add(layers.Dense(16, activation='relu', input_shape=(999,)))
+  model.add(layers.Dense(16, activation='relu', input_shape=(len(dataset),)))
   model.add(layers.Dense(16, activation='relu'))
   model.add(layers.Dense(1, activation='sigmoid'))
 
@@ -38,7 +38,7 @@ def create_predict(dataset):
 
   model.compile(optimizer='rmsprop', loss='binary_crossentropy', metrics=['acc'])
   # history = model.fit(x_train, y_train, epochs=15, callbacks=[es, mc], batch_size=30, validation_split=0.2)
-  history = model.fit(x_train, y_train, epochs=15, batch_size=30, validation_split=0.2)
+  history = model.fit(x_train, y_train, epochs=20, batch_size=60, validation_split=0.2)
 
   # loaded_model = load_model('best_model.h5')
   return model
@@ -77,12 +77,15 @@ def visualize(m_dataset,m_target):
         
 
 #전처리 된 데이터셋 불러오기
-dataset = pd.read_csv('dataset.csv', low_memory=False)
+tp = dt.text_processing(pd.read_csv('dataframe.csv', low_memory=False))
+tp.dataset = tp.dataset.head(1100)
 
+tp.text_normalization()
+tp.text_tokenization()
 
 # visualize(dataset['Title'], dataset['Binary'])
 #모델 생성
-model = create_predict(dataset)
+model = create_predict(tp.dataset)
 
 #모델 불러오기
 # model = load_model('best_model.h5')
