@@ -25,12 +25,15 @@ def create_predict(dataset):
   #     x_train, y_train, test_size=0.2, random_state=1)
 
   model = Sequential()
+
   # model.add(Embedding(1152, 100))
-  # model.add(Bidirectional(LSTM(100)))
+  # model.add(LSTM(128))
   # model.add(Dense(1, activation='relu'))
-  model.add(layers.Dense(16, activation='relu', input_shape=(len(dataset),)))
-  model.add(layers.Dense(16, activation='relu'))
-  model.add(layers.Dense(1, activation='sigmoid'))
+  model.add(Dense(1, activation='sigmoid'))
+
+  # model.add(layers.Dense(16, activation='relu', input_shape=(len(dataset),)))
+  # model.add(layers.Dense(16, activation='relu'))
+  # model.add(layers.Dense(1, activation='sigmoid'))
 
 
   es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=4)
@@ -38,7 +41,7 @@ def create_predict(dataset):
 
   model.compile(optimizer='rmsprop', loss='binary_crossentropy', metrics=['acc'])
   # history = model.fit(x_train, y_train, epochs=15, callbacks=[es, mc], batch_size=30, validation_split=0.2)
-  history = model.fit(x_train, y_train, epochs=20, batch_size=60, validation_split=0.2)
+  history = model.fit(x_train, y_train, epochs=1000, batch_size=60, validation_split=0.2)
 
   # loaded_model = load_model('best_model.h5')
   return model
