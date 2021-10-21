@@ -11,6 +11,8 @@ from keras import layers
 from tensorflow.keras.models import load_model
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 from sklearn.model_selection import train_test_split
+import tensorflowjs as tfjs
+from pandas.plotting import scatter_matrix
 
 def create_predict(dataset):
   dataset = pd.read_csv('dataset.csv', low_memory=False)
@@ -41,7 +43,7 @@ def create_predict(dataset):
 
   model.compile(optimizer='rmsprop', loss='binary_crossentropy', metrics=['acc'])
   # history = model.fit(x_train, y_train, epochs=15, callbacks=[es, mc], batch_size=30, validation_split=0.2)
-  history = model.fit(x_train, y_train, epochs=1000, batch_size=60, validation_split=0.2)
+  history = model.fit(x_train, y_train, epochs=30, batch_size=60, validation_split=0.2)
 
   # loaded_model = load_model('best_model.h5')
   return model
@@ -85,13 +87,18 @@ tp.dataset = tp.dataset.head(1100)
 
 tp.text_normalization()
 tp.text_tokenization()
+tp.text_integer()
+scatter_matrix(tp.dataset, alpha=0.4, figsize=(12, 12), diagonal='kde')
 
 # visualize(dataset['Title'], dataset['Binary'])
 #모델 생성
-model = create_predict(tp.dataset)
+# model = create_predict(tp.dataset)
 
 #모델 불러오기
 # model = load_model('best_model.h5')
+# model.save(filepath="m_model")
+# tfjs.converters.save_keras_model(model, "m_model_tfjs")
 
-s_dataset = sentiment_text_processing()
-sentiment_predict(s_dataset, model)
+
+# s_dataset = sentiment_text_processing()
+# sentiment_predict(s_dataset, model)
