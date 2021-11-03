@@ -1,0 +1,11 @@
+from kafka import kafkaProducer
+from json import dumps
+import time
+
+producer = kafkaProducer(acks=0, compression_type='gzip', bootstrap_servers=['localhost:9092'], value_serializer=lambda x: dumps(x).encode('utf-8')) 
+start = time.time() 
+for i in range(10000): 
+    data = {'str' : 'result'+str(i)} 
+    producer.send('quickstart-events', value=data) 
+    producer.flush()
+print("elapsed :", time.time() - start)
