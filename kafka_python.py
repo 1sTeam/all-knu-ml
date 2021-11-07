@@ -1,9 +1,8 @@
 from kafka import KafkaProducer
-from json import dumps
-import time
 from kafka import KafkaConsumer 
+from json import dumps
 from json import loads
-
+import time
 
 def kafka_producer():
     producer = KafkaProducer(acks=0, compression_type='gzip', bootstrap_servers=['13.124.108.212:9092'], value_serializer=lambda x: dumps(x).encode('utf-8')) 
