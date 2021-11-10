@@ -64,6 +64,7 @@ def crawling():
         noticedict['Category'] =  category
         noticelist.append(noticedict)
     df = pd.DataFrame.from_records(noticelist)
+    print("Crawling success")
     return df
 
 def predict(dataframe):
