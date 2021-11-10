@@ -28,10 +28,10 @@ def create_predict(dataset):
 
   model = Sequential()
 
-  # model.add(Embedding(1152, 100))
-  # model.add(LSTM(128))
-  # model.add(Dense(1, activation='relu'))
-  model.add(Dense(1, activation='sigmoid'))
+  model.add(Embedding(1152, 100))
+  model.add(LSTM(128))
+  model.add(Dense(1, activation='relu'))
+  # model.add(Dense(1, activation='sigmoid'))
 
   # model.add(layers.Dense(16, activation='relu', input_shape=(len(dataset),)))
   # model.add(layers.Dense(16, activation='relu'))
@@ -42,8 +42,8 @@ def create_predict(dataset):
   mc = ModelCheckpoint('best_model.h5', monitor='val_acc', mode='max', verbose=1, save_best_only=True)
 
   model.compile(optimizer='rmsprop', loss='binary_crossentropy', metrics=['acc'])
-  # history = model.fit(x_train, y_train, epochs=15, callbacks=[es, mc], batch_size=30, validation_split=0.2)
-  history = model.fit(x_train, y_train, epochs=30, batch_size=60, validation_split=0.2)
+  history = model.fit(x_train, y_train, epochs=15, callbacks=[es, mc], batch_size=30, validation_split=0.2)
+  # history = model.fit(x_train, y_train, epochs=30, batch_size=60, validation_split=0.2)
 
   # loaded_model = load_model('best_model.h5')
   return model
@@ -92,7 +92,7 @@ scatter_matrix(tp.dataset, alpha=0.4, figsize=(12, 12), diagonal='kde')
 
 # visualize(dataset['Title'], dataset['Binary'])
 #모델 생성
-# model = create_predict(tp.dataset)
+model = create_predict(tp.dataset)
 
 #모델 불러오기
 # model = load_model('best_model.h5')
