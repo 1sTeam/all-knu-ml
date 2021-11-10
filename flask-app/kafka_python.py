@@ -90,7 +90,6 @@ def predict(dataframe):
         else:
             kafka_producer("{:.2f}% 확률로 비교과 프로그램이 아닙니다.\n".format((1 - s) * 100), m_dataset['Title'][i], m_dataset['Link'][i],m_dataset['Category'][i],tm)
 
-
 origin_dataframe = crawling()
 def schedule():
     global origin_dataframe
@@ -101,6 +100,7 @@ def schedule():
             temp.drop(i)
     predict(temp)
     origin_dataframe = dataframe.copy()
+    
 
 sched = BackgroundScheduler(daemon=True)
 for t in range(9,19):

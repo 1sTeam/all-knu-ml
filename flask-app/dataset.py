@@ -1,10 +1,6 @@
 import pandas as pd
 import numpy as np
-from pykospacing import Spacing
 from konlpy.tag import Komoran
-import urllib.request
-from soynlp import DoublespaceLineCorpus
-from soynlp.word import WordExtractor
 from soynlp.normalizer import *
 from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
