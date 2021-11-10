@@ -64,10 +64,11 @@ def crawling():
         noticedict['Category'] =  category
         noticelist.append(noticedict)
     df = pd.DataFrame.from_records(noticelist)
-    print("Crawling success")
+    print("----------Crawling success----------")
     return df
 
 def predict(dataframe):
+    print("----------Model predict----------")
     model = load_model('best_model.h5')
     m_dataset = crawling()
     m_dt = dt.text_processing(m_dataset)
@@ -92,6 +93,7 @@ def predict(dataframe):
 
 origin_dataframe = crawling()
 def schedule():
+    print("----------Schedule start----------")
     global origin_dataframe
     dataframe = crawling()
     temp = dataframe.copy()
@@ -100,9 +102,13 @@ def schedule():
             temp.drop(i)
     predict(temp)
     origin_dataframe = dataframe.copy()
+    print("----------Schedule finished----------")
     
 
 sched = BackgroundScheduler(daemon=True)
-for t in range(9,19):
-    sched.add_job(schedule,'cron', week='1-53', day_of_week='0-4', hour=str(t))
+sched.add_job(schedule,'cron',day_of_week='0-4', hour='9-18')
 sched.start()
+
+while True:
+    print("----------Running main process...----------")
+    time.sleep(5)
