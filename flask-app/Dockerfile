@@ -1,4 +1,4 @@
-FROM python:3
+FROM python:3.8
 
 # set a directory for the app
 WORKDIR /app
@@ -9,8 +9,5 @@ COPY . .
 # install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# tell the port number the container should expose
-EXPOSE 5000
-
 # run the command
-CMD ["python", "./kafka_python.py"]
+CMD ["python", "kafka_python.py"]
