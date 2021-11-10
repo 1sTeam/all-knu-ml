@@ -1,23 +1,37 @@
 from kafka import KafkaProducer
 from kafka import KafkaConsumer 
-import json
-import time
-import requests
 from flask import request
 from bs4 import BeautifulSoup
-import pandas as pd
 from apscheduler.schedulers.background import BackgroundScheduler
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from tensorflow.keras.models import load_model
+import json
+import time
+import requests
+import pandas as pd
 import dataset as dt
 
-def kafka_producer(pred,title,url):
-    producer = KafkaProducer(acks=0, compression_type='gzip', bootstrap_servers=['13.124.108.212:9092'], value_serializer=lambda x: json.dumps(x).encode('utf-8')) 
+def subscribe_type(category):
+    if category=='교수학습지원센터':
+        return 'CTL'
+    elif category=='마음나눔센터':
+        return 'COUNSEL'
+    elif category=='진로취창업센터':
+        return 'CAREER'
+    elif category=='대외교류센터':
+        return 'GLOBAL'
+    else:
+        return 'EXCEPTION'
+
+def kafka_producer(pred,title,url,category, tm):
+    producer = KafkaProducer(acks=0, compression_type='gzip', bootstrap_servers=['13.124.108.212:9092'], value_serializer=lambda x: json.dumps(x).encode('euc-kr')) 
     start = time.time()      
     producer.send("mlRequest", {
+        'subscribeTypes':[subscribe_type(category)],
         'predict':pred,
         'title':title,
-        'clickLink':url
+        'clickLink':url,
+        'time':tm
     }) 
     producer.flush()
     print("elapsed :", time.time() - start)
@@ -40,17 +54,19 @@ def crawling():
         if (item.find('li', class_='black05 ellipsis') != None):
             li_list = item.find_all('li')
             title = item.find('li', class_='black05 ellipsis').find("a").get("title")
+            category = li_list[4].text
             link = item.find('li', class_='black05 ellipsis').find("a").get("data-params")
             link = "https://web.kangnam.ac.kr/menu/board/info/f19069e6134f8f8aa7f689a4a675e66f.do?scrtWrtiYn=false&encMenuSeq=%s&encMenuBoardSeq=%s" %(link[34:66],link[87:119])
         else:
             continue
         noticedict['Title'] = title
         noticedict['Link'] =  link
+        noticedict['Category'] =  category
         noticelist.append(noticedict)
     df = pd.DataFrame.from_records(noticelist)
     return df
 
-def predict():
+def predict(dataframe):
     model = load_model('best_model.h5')
     m_dataset = crawling()
     m_dt = dt.text_processing(m_dataset)
@@ -63,17 +79,29 @@ def predict():
     score = model.predict(x_train)
 
     print(score)
-
+    tm = time.localtime(1575142526.500323)
+    tm = time.strftime('%Y-%m-%d %I:%M:%S %p', tm)
+    
     for i, s in enumerate(score):
         s = float(s)
         if(s > 0.5):
-            kafka_producer("{:.2f}% 확률로 비교과프로그램입니다.\n".format(s * 100), m_dataset['Title'][i], m_dataset['Link'][i])
+            kafka_producer("{:.2f}% 확률로 비교과프로그램입니다.\n".format(s * 100), m_dataset['Title'][i], m_dataset['Link'][i],m_dataset['Category'][i],tm)
         else:
-            kafka_producer("{:.2f}% 확률로 비교과 프로그램이 아닙니다.\n".format((1 - s) * 100), m_dataset['Title'][i], m_dataset['Link'][i])
+            kafka_producer("{:.2f}% 확률로 비교과 프로그램이 아닙니다.\n".format((1 - s) * 100), m_dataset['Title'][i], m_dataset['Link'][i],m_dataset['Category'][i],tm)
 
-predict()
-kafka_consumer()
 
-# sched = BackgroundScheduler(daemon=True)
-# for t in range(10,18,1):sched.add_job(crawling,'cron', week='1-53', day_of_week='0-4', hour=str(t))
-# sched.start()
+origin_dataframe = crawling()
+def schedule():
+    global origin_dataframe
+    dataframe = crawling()
+    temp = dataframe.copy()
+    for i, o in enumerate(origin_dataframe['Title']):
+        if o == dataframe['Title'][i]:
+            temp.drop(i)
+    predict(temp)
+    origin_dataframe = dataframe.copy()
+
+sched = BackgroundScheduler(daemon=True)
+for t in range(9,19):
+    sched.add_job(schedule,'cron', week='1-53', day_of_week='0-4', hour=str(t))
+sched.start()
