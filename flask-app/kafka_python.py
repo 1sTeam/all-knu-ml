@@ -106,10 +106,9 @@ def schedule():
     
 
 sched = BackgroundScheduler(daemon=True)
-for t in range(9,19):
-    sched.add_job(schedule,'cron', week='1-53', day_of_week='0-4', hour=str(t))
+sched.add_job(schedule,'cron',day_of_week='0-4', hour='9-18')
 sched.start()
 
 while True:
     print("----------Running main process...----------")
-    time.sleep(1)
+    time.sleep(5)
