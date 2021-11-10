@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy as np
 from konlpy.tag import Komoran
-from soynlp.normalizer import *
 from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 
