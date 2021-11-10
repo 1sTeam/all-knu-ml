@@ -87,9 +87,11 @@ def predict(dataframe):
     for i, s in enumerate(score):
         s = float(s)
         if(s > 0.5):
-            kafka_producer("{:.2f}% 확률로 비교과프로그램입니다.\n".format(s * 100), m_dataset['Title'][i], m_dataset['Link'][i],m_dataset['Category'][i],tm)
+            # kafka_producer("{:.2f}% 확률로 비교과프로그램입니다.\n".format(s * 100), m_dataset['Title'][i], m_dataset['Link'][i],m_dataset['Category'][i],tm)
+            kafka_producer(1, m_dataset['Title'][i], m_dataset['Link'][i],m_dataset['Category'][i],tm)
         else:
-            kafka_producer("{:.2f}% 확률로 비교과 프로그램이 아닙니다.\n".format((1 - s) * 100), m_dataset['Title'][i], m_dataset['Link'][i],m_dataset['Category'][i],tm)
+            # kafka_producer("{:.2f}% 확률로 비교과 프로그램이 아닙니다.\n".format((1 - s) * 100), m_dataset['Title'][i], m_dataset['Link'][i],m_dataset['Category'][i],tm)
+            kafka_producer(0, m_dataset['Title'][i], m_dataset['Link'][i],m_dataset['Category'][i],tm)
 
 origin_dataframe = crawling()
 def schedule():
