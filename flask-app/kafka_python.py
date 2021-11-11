@@ -107,8 +107,8 @@ def schedule():
     print("----------Schedule finished----------")
     
 
-sched = BackgroundScheduler(daemon=True)
-sched.add_job(schedule,'cron',day_of_week='0-4', hour='9-18')
+sched = BackgroundScheduler(timezone="UTC", daemon=True)
+sched.add_job(schedule,'cron',day_of_week='0-4', hour='0-23')
 sched.start()
 
 while True:

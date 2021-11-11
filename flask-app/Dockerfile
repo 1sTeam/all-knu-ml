@@ -1,4 +1,4 @@
-FROM python:3.8-buster
+FROM ubuntu:20.04
 
 # set a directory for the app
 WORKDIR /app
@@ -6,8 +6,17 @@ WORKDIR /app
 # copy all the files to the container
 COPY . .
 
-# install dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+#install jdk
+RUN apt-get update -y
+RUN apt-get install -y openjdk-11-jdk
+
+RUN apt-get install -y python3-pip
+
+RUN apt-get install -y tzdata
+
+ENV JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+#install dependencies
+RUN pip3 install --no-cache-dir -r requirements.txt
 
 # run the command
-CMD ["python", "kafka_python.py"]
+CMD ["python3", "kafka_python.py"]
