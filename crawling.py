@@ -81,4 +81,4 @@ def single_page_crawling_for_modeling():
     return df
 
 #print(all_pages_crawling())
-# all_pages_crawling().to_csv("dataframe.csv", mode='a', header=False, encoding='utf-8-sig')
+all_pages_crawling().to_csv("dataframe.csv", mode='a', header=False, encoding='utf-8-sig')

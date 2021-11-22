@@ -74,12 +74,6 @@ def sentiment_predict(m_dataset, model):
     else:
       print("{:.2f}% 확률로 비교과 프로그램이 아닙니다.\n".format((1 - s) * 100))
 
-def visualize(m_dataset,m_target):
-    
-    x_train = []
-    for index in dataset['Title']:
-        x_train.append(np.fromstring(index, dtype=int, sep=','))
-        
 
 #전처리 된 데이터셋 불러오기
 tp = dt.text_processing(pd.read_csv('dataframe.csv', low_memory=False))
