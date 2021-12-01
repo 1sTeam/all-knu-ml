@@ -29,10 +29,10 @@ def create_predict():
 
   model = Sequential()
 
-  model.add(Embedding(1152, 100))
-  model.add(LSTM(128))
+  model.add(Embedding(1152, 10))
+  model.add(LSTM(32))
   # model.add(Dense(1, activation='relu'))
-  model.add(Dense(1, activation='sigmoid'))
+  model.add(Dense(12, activation='sigmoid'))
   # model.add(layers.Dense(16, activation='relu', input_shape=(len(dataset),)))
   # model.add(layers.Dense(1, activation='sigmoid'))
 
@@ -44,7 +44,7 @@ def create_predict():
   history = model.fit(x_train, y_train, epochs=15, callbacks=[es, mc], batch_size=30, validation_split=0.2)
   # history = model.fit(x_train, y_train, epochs=15, batch_size=60, validation_split=0.2)
   loaded_model = load_model('best_model.h5')
-  
+
   print("model 검증 정확도 : %.4f" %(loaded_model.evaluate(x_test,y_test)[1]))
   return loaded_model
 
