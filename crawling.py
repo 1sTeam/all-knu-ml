@@ -60,7 +60,7 @@ def single_page_crawling_for_modeling():
     headers = {'user-agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.62 Safari/537.36'}
     noticelist = list()
 
-    url = "https://web.kangnam.ac.kr/menu/f19069e6134f8f8aa7f689a4a675e66f.do?paginationInfo.currentPageNo=100&searchMenuSeq=0&searchType=&searchValue="
+    url = "https://web.kangnam.ac.kr/menu/f19069e6134f8f8aa7f689a4a675e66f.do?paginationInfo.currentPageNo=1&searchMenuSeq=0&searchType=&searchValue="
     response = requests.get(url, headers=headers)
     soup=BeautifulSoup(response.content, 'html.parser')
     noticeArea=soup.find('div', class_='tbody')
