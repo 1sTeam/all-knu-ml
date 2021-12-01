@@ -24,30 +24,29 @@ def create_predict():
 
   x_train = pad_sequences(x_train, maxlen = 12)
   print(x_train.shape)
-  # x_train, x_test, y_train, y_test = train_test_split(
-  #     x_train, y_train, test_size=0.2, random_state=1)
+  x_train, x_test, y_train, y_test = train_test_split(
+      x_train, y_train, test_size=0.2, random_state=1)
 
   model = Sequential()
 
-  # model.add(Embedding(1152, 100))
-  # model.add(LSTM(128))
+  model.add(Embedding(1152, 100))
+  model.add(LSTM(128))
   # model.add(Dense(1, activation='relu'))
-  # # model.add(Dense(1, activation='sigmoid'))
+  model.add(Dense(1, activation='sigmoid'))
+  # model.add(layers.Dense(16, activation='relu', input_shape=(len(dataset),)))
+  # model.add(layers.Dense(1, activation='sigmoid'))
 
-  model.add(layers.Dense(16, activation='relu', input_shape=(len(dataset),)))
-  model.add(layers.Dense(1, activation='sigmoid'))
 
-
-  # es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=4)
-  # mc = ModelCheckpoint('best_model.h5', monitor='val_acc', mode='max', verbose=1, save_best_only=True)
+  es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=4)
+  mc = ModelCheckpoint('best_model.h5', monitor='val_acc', mode='max', verbose=1, save_best_only=True)
 
   model.compile(optimizer='rmsprop', loss='binary_crossentropy', metrics=['acc'])
-  # history = model.fit(x_train, y_train, epochs=15, callbacks=[es, mc], batch_size=30, validation_split=0.2)
-  history = model.fit(x_train, y_train, epochs=30, batch_size=60, validation_split=0.2)
-
-  # loaded_model = load_model('best_model.h5')
-  print("model 검증 정확도 : " + str(max(history.history['val_acc'])))
-  return model
+  history = model.fit(x_train, y_train, epochs=15, callbacks=[es, mc], batch_size=30, validation_split=0.2)
+  # history = model.fit(x_train, y_train, epochs=15, batch_size=60, validation_split=0.2)
+  loaded_model = load_model('best_model.h5')
+  
+  print("model 검증 정확도 : %.4f" %(loaded_model.evaluate(x_test,y_test)[1]))
+  return loaded_model
 
 
 def sentiment_text_processing():
@@ -63,6 +62,7 @@ def sentiment_text_processing():
 def sentiment_predict(m_dataset, model):
   x_train = pad_sequences(m_dataset['Title'], maxlen = 12)
   for sentence in x_train:
+    sentence = sentence.reshape(1,-1)
     score = float(model.predict(sentence))
     if(score > 0.5):
       print("{:.2f}% 확률로 비교과프로그램입니다.\n".format(score * 100))
