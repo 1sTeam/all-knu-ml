@@ -27,7 +27,7 @@ def create_predict():
   for index in dataset['Title']:
     X_train.append(np.fromstring(index, dtype=np.uint8, sep=','))
 
-  X_train = pad_sequences(Y_train, maxlen = 12)
+  X_train = pad_sequences(X_train, maxlen = 12)
   print(X_train.shape)
   x_train, x_test, y_train, y_test = train_test_split(
       X_train, Y_train, test_size=0.2, random_state=1)
@@ -84,12 +84,13 @@ def sentiment_predict(m_dataset, model):
   x_train = pad_sequences(m_dataset['Title'], maxlen = 12)
   for sentence in x_train:
     sentence = sentence.reshape(1,-1)
-    score = float(model.predict(sentence))
+    score = (model.predict_proba(sentence))
     print(score)
-    if(score > 0.5):
-      print("{:.2f}% 확률로 비교과프로그램입니다.\n".format(score * 100))
-    else:
-      print("{:.2f}% 확률로 비교과 프로그램이 아닙니다.\n".format((1 - score) * 100))
+    # print(score)
+    # if(score > 0.5):
+    #   print("{:.2f}% 확률로 비교과프로그램입니다.\n".format(score * 100))
+    # else:
+    #   print("{:.2f}% 확률로 비교과 프로그램이 아닙니다.\n".format((1 - score) * 100))
 
 # # visualize(dataset['Title'], dataset['Binary'])
 # #모델 생성
