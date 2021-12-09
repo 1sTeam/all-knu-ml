@@ -12,6 +12,9 @@ from keras import layers
 from tensorflow.keras.models import load_model
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 from sklearn.model_selection import train_test_split
+from sklearn.svm import SVC
+from sklearn.metrics import classification_report, confusion_matrix
+from sklearn.model_selection import GridSearchCV
 import tensorflowjs as tfjs
 from pandas.plotting import scatter_matrix
 
@@ -27,27 +30,31 @@ def create_predict():
   x_train, x_test, y_train, y_test = train_test_split(
       x_train, y_train, test_size=0.2, random_state=1)
 
-  model = Sequential()
+  hyperparam = {'C':[10,25,50], 'gamma':[0.001,0.0001,0.00001]}
+  grid = GridSearchCV(SVC(), hyperparam)
+  grid.fit(x_train, y_train)
+  model = grid.predict(x_test)
 
-  model.add(Embedding(1152, 10))
-  model.add(LSTM(32))
-  # model.add(Dense(1, activation='relu'))
-  model.add(Dense(12, activation='sigmoid'))
+  print(confusion_matrix(y_test,model))
+  print(classification_report(y_test, model))
+  # model.add(Embedding(1152, 10))
+  # model.add(LSTM(32))
+  # # model.add(Dense(1, activation='relu'))
+  # model.add(Dense(12, activation='sigmoid'))
   # model.add(layers.Dense(16, activation='relu', input_shape=(len(dataset),)))
   # model.add(layers.Dense(1, activation='sigmoid'))
 
 
-  es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=4)
-  mc = ModelCheckpoint('best_model.h5', monitor='val_acc', mode='max', verbose=1, save_best_only=True)
+  # es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=4)
+  # mc = ModelCheckpoint('best_model.h5', monitor='val_acc', mode='max', verbose=1, save_best_only=True)
 
-  model.compile(optimizer='rmsprop', loss='binary_crossentropy', metrics=['acc'])
-  history = model.fit(x_train, y_train, epochs=15, callbacks=[es, mc], batch_size=30, validation_split=0.2)
+  # model.compile(optimizer='rmsprop', loss='binary_crossentropy', metrics=['acc'])
+  # history = model.fit(x_train, y_train, epochs=15, callbacks=[es, mc], batch_size=30, validation_split=0.2)
   # history = model.fit(x_train, y_train, epochs=15, batch_size=60, validation_split=0.2)
-  loaded_model = load_model('best_model.h5')
+  # loaded_model = load_model('best_model.h5')
 
-  print("model 검증 정확도 : %.4f" %(loaded_model.evaluate(x_test,y_test)[1]))
-  return loaded_model
-
+  # print("model 검증 정확도 : %.4f" %(loaded_model.evaluate(x_test,y_test)[1]))
+  return grid
 
 def sentiment_text_processing():
   m_dataset = cl.single_page_crawling_for_modeling()
@@ -63,7 +70,8 @@ def sentiment_predict(m_dataset, model):
   x_train = pad_sequences(m_dataset['Title'], maxlen = 12)
   for sentence in x_train:
     sentence = sentence.reshape(1,-1)
-    score = float(model.predict(sentence))
+    score = model.predict(sentence)
+    print(score)
     if(score > 0.5):
       print("{:.2f}% 확률로 비교과프로그램입니다.\n".format(score * 100))
     else:
