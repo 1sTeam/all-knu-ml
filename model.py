@@ -17,44 +17,58 @@ from sklearn.metrics import classification_report, confusion_matrix
 from sklearn.model_selection import GridSearchCV
 import tensorflowjs as tfjs
 from pandas.plotting import scatter_matrix
+from sklearn.preprocessing import StandardScaler
+from sklearn.neighbors import KNeighborsClassifier
 
 def create_predict():
   dataset = read_csv("dataset.csv")
-  y_train = np.array(dataset['Binary'])
-  x_train = []
+  Y_train = np.array(dataset['Binary'])
+  X_train = []
   for index in dataset['Title']:
-    x_train.append(np.fromstring(index, dtype=np.uint8, sep=','))
+    X_train.append(np.fromstring(index, dtype=np.uint8, sep=','))
 
-  x_train = pad_sequences(x_train, maxlen = 12)
-  print(x_train.shape)
+  X_train = pad_sequences(Y_train, maxlen = 12)
+  print(X_train.shape)
   x_train, x_test, y_train, y_test = train_test_split(
-      x_train, y_train, test_size=0.2, random_state=1)
+      X_train, Y_train, test_size=0.2, random_state=1)
 
-  hyperparam = {'C':[10,25,50], 'gamma':[0.001,0.0001,0.00001]}
-  grid = GridSearchCV(SVC(), hyperparam)
-  grid.fit(x_train, y_train)
-  model = grid.predict(x_test)
+  # KNN 알고리즘
+  model = KNeighborsClassifier(n_neighbors=3)
+  model.fit(x_train, y_train)
+  fred = model.predict(x_test)
+  # SVC 알고리즘
+  """
+    # hyperparam = {'C':[10,25,50], 'gamma':[0.001,0.0001,0.00001]}
+    # grid = GridSearchCV(SVC(), hyperparam)
+    # grid.fit(x_train, y_train)
+    # model = grid.predict(x_test)
 
-  print(confusion_matrix(y_test,model))
-  print(classification_report(y_test, model))
-  # model.add(Embedding(1152, 10))
-  # model.add(LSTM(32))
-  # # model.add(Dense(1, activation='relu'))
-  # model.add(Dense(12, activation='sigmoid'))
-  # model.add(layers.Dense(16, activation='relu', input_shape=(len(dataset),)))
-  # model.add(layers.Dense(1, activation='sigmoid'))
+  """
+  print(confusion_matrix(y_test,fred))
+  print(classification_report(y_test, fred))
+
+  # 로지스틱 회귀 및 임베딩 LSTM
+  """
+    # model.add(Embedding(1152, 10))
+    # model.add(LSTM(32))
+    # # model.add(Dense(1, activation='relu'))
+    # model.add(Dense(12, activation='sigmoid'))
+    # model.add(layers.Dense(16, activation='relu', input_shape=(len(dataset),)))
+    # model.add(layers.Dense(1, activation='sigmoid'))
 
 
-  # es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=4)
-  # mc = ModelCheckpoint('best_model.h5', monitor='val_acc', mode='max', verbose=1, save_best_only=True)
+    # es = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=4)
+    # mc = ModelCheckpoint('best_model.h5', monitor='val_acc', mode='max', verbose=1, save_best_only=True)
 
-  # model.compile(optimizer='rmsprop', loss='binary_crossentropy', metrics=['acc'])
-  # history = model.fit(x_train, y_train, epochs=15, callbacks=[es, mc], batch_size=30, validation_split=0.2)
-  # history = model.fit(x_train, y_train, epochs=15, batch_size=60, validation_split=0.2)
-  # loaded_model = load_model('best_model.h5')
+    # model.compile(optimizer='rmsprop', loss='binary_crossentropy', metrics=['acc'])
+    # history = model.fit(x_train, y_train, epochs=15, callbacks=[es, mc], batch_size=30, validation_split=0.2)
+    # history = model.fit(x_train, y_train, epochs=15, batch_size=60, validation_split=0.2)
+    # loaded_model = load_model('best_model.h5')
 
-  # print("model 검증 정확도 : %.4f" %(loaded_model.evaluate(x_test,y_test)[1]))
-  return grid
+    # print("model 검증 정확도 : %.4f" %(loaded_model.evaluate(x_test,y_test)[1]))
+  """
+
+  return model
 
 def sentiment_text_processing():
   m_dataset = cl.single_page_crawling_for_modeling()
@@ -70,7 +84,7 @@ def sentiment_predict(m_dataset, model):
   x_train = pad_sequences(m_dataset['Title'], maxlen = 12)
   for sentence in x_train:
     sentence = sentence.reshape(1,-1)
-    score = model.predict(sentence)
+    score = float(model.predict(sentence))
     print(score)
     if(score > 0.5):
       print("{:.2f}% 확률로 비교과프로그램입니다.\n".format(score * 100))
